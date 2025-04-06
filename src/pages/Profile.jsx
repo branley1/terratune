@@ -1,117 +1,115 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useApi } from '../hooks/useApi';
-// Import components like a UserEditForm later if needed
+import ProfileEditForm from '../components/ProfileEditForm';
 
 const ProfilePage = () => {
-  const { user, logout } = useAuth(); // Get user info and logout function
+  const { user, updateUser } = useAuth();
   const { request, loading, error } = useApi();
-  const [profileData, setProfileData] = useState(null); // For potentially more detailed data
-  const [isEditing, setIsEditing] = useState(false); // State for edit mode
+  const [profileData, setProfileData] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
-  // Fetch potentially more detailed profile data if needed
   useEffect(() => {
     if (!user) return;
-    // Example: If you have a specific profile endpoint
-    const fetchProfile = async () => {
-      try {
-        const data = await request(`/users/${user.id}`); 
-        setProfileData(data);
-      } catch (err) {
-        console.error("Failed to fetch profile:", err);
-      }
-    };
-    // fetchProfile(); 
-    // For now, just use the basic user data from AuthContext
     setProfileData(user);
-  }, [user, request]);
+  }, [user]);
 
   if (!profileData) {
-    // Can show loading state or handle user not logged in
-    return <div className="p-6">Loading profile...</div>;
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto"></div>
+          <p className="mt-4 text-white/70">Loading profile...</p>
+        </div>
+      </div>
+    );
   }
 
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
   };
 
-  // TODO: Implement profile update logic
-  const handleUpdateProfile = async (formData) => {
-    console.log("Updating profile with:", formData);
-    // try {
-    //   const updatedUser = await request(`/users/${user.id}`, {
-    //     method: 'PUT',
-    //     body: JSON.stringify(formData),
-    //   });
-    //   // Update AuthContext or refetch profile
-    //   setIsEditing(false);
-    // } catch (err) {
-    //   console.error("Profile update failed:", err);
-    // }
+  const handleUpdateSuccess = async (updatedUser) => {
+    try {
+      // Update the user data in the backend
+      const response = await request(`/users/${user.id}`, {
+        method: 'PUT',
+        body: JSON.stringify(updatedUser),
+      });
+
+      // Update the user data in the auth context and local state
+      updateUser(response);
+      setProfileData(response);
+      setIsEditing(false);
+    } catch (err) {
+      console.error('Failed to update profile:', err);
+    }
   };
 
+  // Get display name (name or username)
+  const displayName = profileData.name || profileData.username || 'User';
+
   return (
-    <div className="p-6">
-      {/* Mimic structure from original static HTML */}
-      <div className="profile-header mb-8 flex items-center gap-6">
-        {/* Placeholder image */}
-        <div className="w-32 h-32 md:w-48 md:h-48 bg-gray-700 rounded-full shadow-lg flex-shrink-0 flex items-center justify-center text-4xl font-bold">
-           {profileData.username ? profileData.username.charAt(0).toUpperCase() : 'U'}
+    <div className="flex-1 flex flex-col items-center">
+      <div className="w-full max-w-4xl px-4 py-8">
+        {/* Profile Header */}
+        <div className="bg-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/10 mb-8">
+          <div className="flex flex-col md:flex-row items-center gap-6">
+            <div className="relative">
+              {profileData.avatar ? (
+                <img
+                  src={profileData.avatar}
+                  alt={displayName}
+                  className="w-32 h-32 md:w-48 md:h-48 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-32 h-32 md:w-48 md:h-48 bg-white/10 rounded-full flex items-center justify-center text-4xl font-bold">
+                  {displayName.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
+            <div className="text-center md:text-left">
+              <div className="text-sm font-bold text-white/70 uppercase mb-1">Profile</div>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2">{displayName}</h1>
+              <p className="text-white/70">{profileData.email}</p>
+              {profileData.bio && (
+                <p className="mt-4 text-white/70">{profileData.bio}</p>
+              )}
+            </div>
+          </div>
         </div>
-        <div className="details">
-          <div className="profile-type text-sm font-bold text-gray-400 uppercase mb-1">Profile</div>
-          <h1 className="text-4xl lg:text-6xl font-bold mb-2">{profileData.username}</h1>
-          <p className="text-gray-400">{profileData.email}</p>
-          {/* Placeholder stats - fetch these later */} 
-          {/* <div className="stats mt-2 text-sm text-gray-300">
-            <span>0 Public Playlists</span>
-            <span className="mx-2">&bull;</span>
-            <span>0 Liked Songs</span>
-            <span className="mx-2">&bull;</span>
-            <span>Following 0 Artists</span>
-          </div> */} 
+
+        {/* Action Buttons */}
+        <div className="flex justify-center gap-4 mb-8">
+          <button
+            onClick={handleEditToggle}
+            className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors"
+          >
+            {isEditing ? 'Cancel' : 'Edit Profile'}
+          </button>
+          <button
+            onClick={() => window.location.href = '/logout'}
+            className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors"
+          >
+            Log Out
+          </button>
+        </div>
+
+        {/* Edit Form */}
+        {isEditing && (
+          <ProfileEditForm
+            user={profileData}
+            onCancel={handleEditToggle}
+            onSuccess={handleUpdateSuccess}
+          />
+        )}
+
+        {/* Public Playlists Section */}
+        <div className="bg-white/5 backdrop-blur-lg rounded-xl p-6 border border-white/10">
+          <h2 className="text-xl font-bold mb-4">Public Playlists</h2>
+          <p className="text-white/70">No public playlists yet.</p>
         </div>
       </div>
-
-      {/* Placeholder for user's content (e.g., public playlists) */}
-      <div className="mb-8">
-        <h2 className="text-xl font-bold mb-4">Public Playlists</h2>
-        <p className="text-gray-500">No public playlists yet.</p>
-      </div>
-
-      <div className="flex gap-4">
-         <button 
-           onClick={handleEditToggle} 
-           className="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600"
-         >
-           {isEditing ? 'Cancel' : 'Edit Profile'}
-         </button>
-         <button 
-           onClick={logout} 
-           className="px-4 py-2 rounded bg-red-600 hover:bg-red-500"
-         >
-           Log Out
-         </button>
-      </div>
-
-      {isEditing && (
-        <div className="mt-6 p-4 border border-gray-700 rounded bg-gray-800">
-          <h3 className="text-lg font-semibold mb-4">Edit Profile</h3>
-          {/* Placeholder for an Edit Form component */}
-          <form onSubmit={(e) => { e.preventDefault(); handleUpdateProfile({ /* form data */ }); }}>
-             <div className="mb-3">
-               <label className="block mb-1 text-sm text-gray-400">Username</label>
-               <input type="text" defaultValue={profileData.username} className="w-full p-2 rounded bg-gray-700" />
-             </div>
-             <div className="mb-3">
-               <label className="block mb-1 text-sm text-gray-400">Email</label>
-               <input type="email" defaultValue={profileData.email} className="w-full p-2 rounded bg-gray-700" />
-             </div>
-             <button type="submit" className="px-4 py-2 rounded bg-emerald-600 hover:bg-emerald-500">Save Changes</button>
-          </form>
-        </div>
-      )}
-
     </div>
   );
 };

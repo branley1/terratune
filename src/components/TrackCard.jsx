@@ -1,33 +1,35 @@
 import React from 'react';
-import { useAudioContext } from '../contexts/AudioContext';
+import { useAudio } from '../contexts/AudioContext';
 
 const TrackCard = ({ track, playlist = [] }) => {
-  const { playTrack, currentTrack, isPlaying } = useAudioContext();
+  const { setCurrentTrack, currentTrack, isPlaying, togglePlay } = useAudio();
 
   const handlePlay = () => {
     if (playlist.length > 0) {
       const trackIndex = playlist.findIndex(t => t.id === track.id);
       if (trackIndex !== -1) {
-        playTrack(playlist[trackIndex]);
+        setCurrentTrack(playlist[trackIndex]);
+        togglePlay();
       }
     } else {
-      playTrack(track);
+      setCurrentTrack(track);
+      togglePlay();
     }
   };
 
   const isCurrentTrack = currentTrack?.id === track.id;
 
   return (
-    <div className="card group">
+    <div className="song-card rounded-lg p-4 cursor-pointer transition-all duration-200 hover:shadow-lg">
       <div className="relative">
         <img
           src={track.album?.cover_url || '/default-album.jpg'}
           alt={track.title}
-          className="w-full aspect-square rounded-lg object-cover"
+          className="w-full aspect-square rounded-lg object-cover shadow-md"
         />
         <button
           onClick={handlePlay}
-          className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"
+          className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"
         >
           {isCurrentTrack && isPlaying ? (
             <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -41,8 +43,8 @@ const TrackCard = ({ track, playlist = [] }) => {
         </button>
       </div>
       <div className="mt-4">
-        <h3 className="font-medium truncate">{track.title}</h3>
-        <p className="text-sm text-gray-400 truncate">{track.artist?.name}</p>
+        <h3 className="font-medium truncate text-white">{track.title}</h3>
+        <p className="text-sm text-white/70 truncate">{track.artist?.name}</p>
       </div>
     </div>
   );

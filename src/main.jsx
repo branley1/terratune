@@ -5,6 +5,7 @@ import App from './App'
 import { AuthProvider } from './contexts/AuthContext'
 import { AudioProvider } from './contexts/AudioContext'
 import './index.css'
+import './custom.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

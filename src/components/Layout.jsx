@@ -1,43 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Outlet } from 'react-router-dom'; // Used to render child routes
 import Sidebar from './Sidebar'; // We'll create this next
 import Player from './Player'; // Use the existing Player component
 
-const Layout = () => {
-  // State to manage sidebar visibility (like in original script.js)
-  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+const Layout = ({ children }) => {
+  // State to manage sidebar visibility - initialize as false
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
+  const sidebarRef = useRef(null);
 
+  // Toggle sidebar visibility and update body class
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible);
   };
 
+  // Handle clicks outside the sidebar
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isSidebarVisible && sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        setIsSidebarVisible(false);
+      }
+    };
+
+    // Add event listener when sidebar is visible
+    if (isSidebarVisible) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    // Cleanup
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isSidebarVisible]);
+
+  // Apply or remove sidebar-visible class on body element
+  useEffect(() => {
+    if (isSidebarVisible) {
+      document.body.classList.add('sidebar-visible');
+    } else {
+      document.body.classList.remove('sidebar-visible');
+    }
+    
+    // Cleanup when component unmounts
+    return () => {
+      document.body.classList.remove('sidebar-visible');
+    };
+  }, [isSidebarVisible]);
+
   return (
-    // Add class based on sidebar state, similar to original body class toggling
-    <div className={`app-container flex h-screen overflow-hidden ${isSidebarVisible ? 'sidebar-visible' : 'sidebar-collapsed'}`}>
+    <div className="app-container h-screen overflow-hidden">
       
-      <Sidebar isVisible={isSidebarVisible} onToggle={toggleSidebar} />
-
-      {/* Main Area (Content + Player) */}
-      {/* Use padding-left to account for sidebar width */}
-      <div 
-        className={`main-area flex-1 flex flex-col overflow-hidden transition-all duration-300 ease-in-out ${isSidebarVisible ? 'pl-60' : 'pl-20'}`}
-        // Apply dynamic padding left based on sidebar state
-      >
-        {/* Main Content Area - Child routes will render here */}
-        {/* Add padding-bottom to account for player bar height */}
-        <main className="main-content flex-1 overflow-y-auto pb-24"> 
-           {/* Removed fixed padding, added pb-24 for player */} 
-          <Outlet /> 
-        </main>
-
-        {/* Player Bar - Positioned at the bottom */}
-        <div className="player-wrapper fixed bottom-0 left-0 right-0 z-40">
-            {/* Apply padding-left to player wrapper as well */}
-            <div className={`transition-all duration-300 ease-in-out ${isSidebarVisible ? 'pl-60' : 'pl-20'}`}>
-                <Player />
-            </div>
-        </div>
+      {/* Sidebar component with visibility control */}
+      <div ref={sidebarRef}>
+        <Sidebar isVisible={isSidebarVisible} onToggle={toggleSidebar} />
       </div>
+
+      {/* Main Area - Content */}
+      <div className="main-area flex-1 flex flex-col overflow-hidden">
+        {/* Main Content - Child routes will render here */}
+        <main className="main-content flex-1 overflow-y-auto p-6">
+          {children || <Outlet />}
+        </main>
+      </div>
+      
+      {/* Player remains at the bottom of the page via fixed positioning in its own component */}
     </div>
   );
 };

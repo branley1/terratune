@@ -17,23 +17,21 @@ function App() {
   return (
     <AuthProvider>
       <AudioProvider>
-        <div className="flex flex-col h-screen bg-secondary-900 text-white">
-          <div className="flex flex-1 overflow-hidden">
-            <Layout>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
-                <Route path="/library" element={<ProtectedRoute><Library /></ProtectedRoute>} />
-                <Route path="/playlist/:id" element={<ProtectedRoute><Playlist /></ProtectedRoute>} />
-                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-              </Routes>
-            </Layout>
-          </div>
-          <div className="h-48">
-            <Visualizer />
-          </div>
+        <div className="flex flex-col h-screen bg-gradient-to-br from-primary via-secondary to-tertiary text-white overflow-hidden">
+          <Routes>
+            {/* Auth routes without layout */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            
+            {/* Protected routes with layout */}
+            <Route element={<Layout><ProtectedRoute /></Layout>}>
+              <Route path="/" element={<Home />} />
+              <Route path="/search" element={<Search />} />
+              <Route path="/library" element={<Library />} />
+              <Route path="/playlist/:id" element={<Playlist />} />
+              <Route path="/profile" element={<Profile />} />
+            </Route>
+          </Routes>
           <Player />
         </div>
       </AudioProvider>

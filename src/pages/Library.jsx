@@ -18,7 +18,7 @@ const LibraryPage = () => {
 
       try {
         // Fetch user's playlists
-        const userPlaylists = await request(`/playlists/user/${user.id}`);
+        const userPlaylists = await request(`/api/playlists/user/${user.id}`);
         setPlaylists(userPlaylists || []);
         
         // TODO: Fetch followed artists, saved albums etc.

@@ -7,8 +7,14 @@ export const API_URL = process.env.NODE_ENV === 'production'
 // Helper function to add authorization header
 export const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
+  if (!token) {
+    console.warn('No authentication token found');
+    return {
+      'Content-Type': 'application/json'
+    };
+  }
   return {
     'Content-Type': 'application/json',
-    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    'Authorization': `Bearer ${token}`
   };
 }; 

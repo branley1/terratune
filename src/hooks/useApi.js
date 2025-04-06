@@ -10,12 +10,14 @@ export const useApi = () => {
     setError(null);
 
     try {
+      const headers = {
+        ...getAuthHeaders(),
+        ...options.headers,
+      };
+
       const response = await fetch(`${API_URL}${endpoint}`, {
         ...options,
-        headers: {
-          ...getAuthHeaders(),
-          ...options.headers,
-        },
+        headers,
       });
 
       if (!response.ok) {

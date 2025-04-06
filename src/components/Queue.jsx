@@ -39,45 +39,50 @@ const Queue = () => {
 
   if (queue.length === 0) {
     return (
-      <div className="p-4 text-center text-gray-500">
-        Your queue is empty
+      <div className="queue-section rounded-xl p-5 flex flex-col items-center justify-center min-h-[200px]">
+        <i className="fas fa-music text-accent/60 text-4xl mb-3"></i>
+        <p className="text-white/70 text-center">Your queue is empty</p>
+        <p className="text-white/50 text-sm text-center mt-2">Add songs to your queue to continue your journey</p>
       </div>
     );
   }
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Queue</h2>
-      <div className="space-y-2">
+    <div className="queue-section rounded-xl p-5 flex flex-col">
+      <h2 className="section-title text-xl font-bold mb-4 flex items-center">
+        <i className="fas fa-stream text-accent mr-2"></i>
+        Your Queue
+      </h2>
+      <div className="queue-list flex-grow overflow-y-auto">
         {tracks.map((track) => (
           <div
             key={track.id}
-            className={`p-3 rounded-lg cursor-pointer transition-colors ${
+            className={`song-card flex items-center p-3 my-2 rounded-lg cursor-pointer transition-all duration-200 ${
               currentTrack?.id === track.id
-                ? 'bg-indigo-100 border-indigo-500'
-                : 'hover:bg-gray-100'
+                ? 'bg-white/10 border-accent'
+                : 'hover:bg-white/10'
             }`}
             onClick={() => handleTrackClick(track)}
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gray-200 rounded flex items-center justify-center">
+            <div className="flex items-center w-full justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-black/20 rounded flex items-center justify-center flex-shrink-0">
                   {currentTrack?.id === track.id && isPlaying ? (
-                    <svg className="w-6 h-6 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M5 4h3v12H5V4zm7 0h3v12h-3V4z" />
-                    </svg>
+                    <i className="fas fa-pause text-accent"></i>
                   ) : (
-                    <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                    </svg>
+                    <i className="fas fa-play text-white/70"></i>
                   )}
                 </div>
-                <div>
-                  <h3 className="font-medium">{track.title}</h3>
-                  <p className="text-sm text-gray-500">{track.artist_name}</p>
+                <div className="song-details min-w-0 flex-1">
+                  <h4 className="font-semibold text-sm whitespace-nowrap overflow-hidden text-ellipsis">
+                    {track.title}
+                  </h4>
+                  <p className="text-xs text-white/70 whitespace-nowrap overflow-hidden text-ellipsis">
+                    {track.artist_name}
+                  </p>
                 </div>
               </div>
-              <span className="text-sm text-gray-500">
+              <span className="duration text-xs text-white/70 flex-shrink-0">
                 {Math.floor(track.duration / 60)}:{(track.duration % 60).toString().padStart(2, '0')}
               </span>
             </div>

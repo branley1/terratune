@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TerraTune - Nature's Echo</title>
-    <!-- We'll rely on Vite for Tailwind and CSS -->
-    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    <!-- Tailwind directives will be handled by Vite/PostCSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- <link rel="stylesheet" href="css/style.css"> -->
+    <!-- src/index.css includes Tailwind base, components, utilities and custom.css -->
 </head>
-<body class="bg-gray-900 text-white"> <!-- Simplified body styling for now -->
+<body class="font-sans bg-gradient-to-br from-primary via-secondary to-tertiary text-white">
 
     <!-- React will render the entire application structure -->
     <div id="root"></div>
@@ -17,7 +17,5 @@
     <!-- Vite includes the main React script -->
     <script type="module" src="/src/main.jsx"></script>
 
-    <!-- Removed the old script.js inclusion -->
-    <!-- <script src="js/script.js"></script> -->
 </body>
 </html>
