@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useApi } from '../hooks/useApi';
 import ProfileEditForm from '../components/ProfileEditForm';
 
 const ProfilePage = () => {
   const { user, updateUser } = useAuth();
-  const { request, loading, error } = useApi();
   const [profileData, setProfileData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -29,21 +27,10 @@ const ProfilePage = () => {
     setIsEditing(!isEditing);
   };
 
-  const handleUpdateSuccess = async (updatedUser) => {
-    try {
-      // Update the user data in the backend
-      const response = await request(`/users/${user.id}`, {
-        method: 'PUT',
-        body: JSON.stringify(updatedUser),
-      });
-
-      // Update the user data in the auth context and local state
-      updateUser(response);
-      setProfileData(response);
-      setIsEditing(false);
-    } catch (err) {
-      console.error('Failed to update profile:', err);
-    }
+  const handleEditSubmitSuccess = (updatedUserDataFromApi) => {
+    updateUser(updatedUserDataFromApi);
+    setProfileData(updatedUserDataFromApi);
+    setIsEditing(false);
   };
 
   // Get display name (name or username)
@@ -100,7 +87,7 @@ const ProfilePage = () => {
           <ProfileEditForm
             user={profileData}
             onCancel={handleEditToggle}
-            onSuccess={handleUpdateSuccess}
+            onSuccess={handleEditSubmitSuccess}
           />
         )}
 

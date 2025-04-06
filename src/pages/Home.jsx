@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useApi } from '../hooks/useApi';
+import { useAuth } from '../contexts/AuthContext';
+import { Link } from 'react-router-dom';
 import Queue from '../components/Queue';
 import TrackCard from '../components/TrackCard';
 
 const Home = () => {
   const { request, loading, error } = useApi();
+  const { user } = useAuth();
   const [tracks, setTracks] = useState([]);
   const [playlists, setPlaylists] = useState([]);
 
@@ -28,28 +31,36 @@ const Home = () => {
     fetchData();
   }, [request]);
 
-  // Simulate playlist data for now
+  // Simulate playlist data for now, alternating cover images
   const placeholderPlaylists = [
     { id: 1, title: 'Forest Ambience', artist: 'TerraTune', cover_url: '/placeholder-1.jpg' },
     { id: 2, title: 'Mountain Winds', artist: 'Nature\'s Echo', cover_url: '/placeholder-2.jpg' },
-    { id: 3, title: 'Gentle Rain', artist: 'Serene Sounds', cover_url: '/placeholder-3.jpg' },
-    { id: 4, title: 'Ocean Waves', artist: 'TerraTune', cover_url: '/placeholder-4.jpg' },
+    { id: 3, title: 'Gentle Rain', artist: 'Serene Sounds', cover_url: '/placeholder-1.jpg' }, // Alternated
+    { id: 4, title: 'Ocean Waves', artist: 'TerraTune', cover_url: '/placeholder-2.jpg' }, // Alternated
+    // Add more examples if needed, continue alternating
+    // { id: 5, title: 'Desert Night', artist: 'Echoes', cover_url: '/placeholder-1.jpg' },
   ];
+
+  // Calculate display name and initial
+  const displayName = user?.name || user?.username || 'User';
+  const userInitial = displayName.charAt(0).toUpperCase();
 
   return (
     <section className="px-2 py-4">
       <header className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-white">Welcome Back!</h2>
+          <h2 className="text-2xl font-bold text-white">Welcome Back, {displayName}!</h2>
           <p className="text-white/70 mt-1">Discover natural sounds for your day</p>
         </div>
         
-        {/* Profile Button */}
-        <div className="profile-button-container relative">
-           <button className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-black font-bold text-sm hover:bg-accent/90 transition-colors" title="View Profile">
-             W {/* Placeholder Initial */}
-           </button>
-         </div>
+        {/* Profile Button as Link */}
+        <Link 
+          to="/profile" 
+          className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-black font-bold text-sm hover:bg-accent/90 transition-colors flex-shrink-0"
+          title="View Profile"
+        >
+          {userInitial}
+        </Link>
       </header>
 
       {/* Content Grid */}
@@ -62,15 +73,15 @@ const Home = () => {
           </h2>
           <div className="card-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {placeholderPlaylists.map(playlist => (
-              <div key={playlist.id} className="playlist-card rounded-lg p-4 shadow-md transition-all duration-200">
-                <img 
-                  src={playlist.cover_url || '/default-playlist.jpg'} 
-                  alt={playlist.title}
-                  className="w-full aspect-square object-cover rounded-lg mb-3 shadow" 
-                />
-                <h4 className="font-bold text-white whitespace-nowrap overflow-hidden text-ellipsis">{playlist.title}</h4>
-                <p className="text-sm text-white/70 whitespace-nowrap overflow-hidden text-ellipsis">{playlist.artist}</p>
-              </div>
+              <TrackCard 
+                key={playlist.id} 
+                track={{ 
+                  id: playlist.id, 
+                  title: playlist.title, 
+                  artist: { name: playlist.artist },
+                  album: { cover_url: playlist.cover_url }
+                }} 
+              />
             ))}
           </div>
 

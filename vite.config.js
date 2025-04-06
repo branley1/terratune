@@ -6,14 +6,18 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'http://localhost:3001',
         changeOrigin: true,
+        secure: false,
       },
       '/stream': {
-        target: 'http://localhost:3000',
+        target: 'http://localhost:3001',
         changeOrigin: true,
         secure: false,
       }
+    },
+    headers: {
+      'Content-Security-Policy': "worker-src 'self' blob:;"
     }
   },
   build: {

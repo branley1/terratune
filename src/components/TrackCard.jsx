@@ -19,13 +19,17 @@ const TrackCard = ({ track, playlist = [] }) => {
 
   const isCurrentTrack = currentTrack?.id === track.id;
 
+  // Determine which placeholder image to use based on track ID
+  const placeholderImage = track.id % 2 === 1 ? '/placeholder-1.jpg' : '/placeholder-2.jpg';
+
   return (
-    <div className="song-card rounded-lg p-4 cursor-pointer transition-all duration-200 hover:shadow-lg">
+    <div className="song-card rounded-lg p-4 cursor-pointer transition-all duration-200 hover:shadow-lg group">
       <div className="relative">
         <img
-          src={track.album?.cover_url || '/default-album.jpg'}
+          src={placeholderImage}
           alt={track.title}
           className="w-full aspect-square rounded-lg object-cover shadow-md"
+          onError={(e) => { e.target.onerror = null; e.target.src='/default-playlist.svg'}}
         />
         <button
           onClick={handlePlay}

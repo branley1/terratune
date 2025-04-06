@@ -9,7 +9,7 @@ const LoginForm = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, error: authError } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,19 +25,37 @@ const LoginForm = () => {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
+      let data;
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        const responseText = await response.text();
+        console.error('Non-JSON response body:', responseText);
+        throw new Error(`Server returned non-JSON response (status: ${response.status}). Check server logs and API endpoint.`);
       }
 
-      // Use the AuthContext login function
-      login(data.user, data.token);
+      if (!response.ok) {
+        throw new Error(data.error || data.message || `Login failed with status: ${response.status}`);
+      }
 
-      // Redirect to home page
+      if (!data.user || !data.token) {
+        console.error('Invalid response structure:', data);
+        throw new Error('Invalid response structure from server');
+      }
+
+      await login(data.user, data.token);
+
       navigate('/');
     } catch (err) {
-      setError(err.message);
+      console.error('Login error:', err);
+      if (err.message && err.message.includes('non-JSON response')) {
+        setError('Unable to connect or invalid response from the server. Please check API status and path.');
+      } else if (err.message && err.message.includes('Invalid authentication token')) {
+        setError('Invalid or expired authentication token received from server.');
+      } else {
+        setError(err.message || 'Failed to login. Please check your credentials and try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -55,9 +73,9 @@ const LoginForm = () => {
           </p>
         </div>
         <form className="space-y-6" onSubmit={handleSubmit}>
-          {error && (
+          {(error || authError) && (
             <div className="bg-red-500/20 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg" role="alert">
-              <span className="block sm:inline">{error}</span>
+              <span className="block sm:inline">{error || authError}</span>
             </div>
           )}
           <div className="rounded-md shadow-sm -space-y-px">
@@ -101,29 +119,19 @@ const LoginForm = () => {
               disabled={isLoading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-accent hover:bg-accent/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? (
-                <span className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Signing in...
-                </span>
-              ) : (
-                'Sign in'
-              )}
+              {isLoading ? 'Signing in...' : 'Sign in'}
             </button>
           </div>
-        </form>
 
-        <div className="text-center mt-6">
-          <p className="text-sm text-white/70">
-            Don't have an account?{' '}
-            <Link to="/register" className="font-medium text-accent hover:text-accent/90">
-              Create one
-            </Link>
-          </p>
-        </div>
+          <div className="text-center">
+            <p className="text-sm text-white/70">
+              Don't have an account?{' '}
+              <Link to="/register" className="font-medium text-accent hover:text-accent/90">
+                Sign up
+              </Link>
+            </p>
+          </div>
+        </form>
       </div>
     </div>
   );

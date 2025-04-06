@@ -11,7 +11,7 @@ const ProfileEditForm = ({ user, onCancel, onSuccess }) => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { request } = useApi();
-  const { token, user: currentUser } = useAuth();
+  const { token, user: currentUser, updateUser } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,16 +32,24 @@ const ProfileEditForm = ({ user, onCancel, onSuccess }) => {
       return;
     }
 
+    const requestBody = {
+        name: formData.name,
+        bio: formData.bio,
+        avatar: formData.avatar,
+    };
+
     try {
-      const updatedUser = await request(`/api/users/${currentUser.id}`, {
-        method: 'PATCH',
+      const updatedUserFromApi = await request(`/users/${currentUser.id}`, {
+        method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(requestBody),
       });
-      onSuccess(updatedUser);
+
+      onSuccess(updatedUserFromApi);
+
     } catch (err) {
       setError(err.message || 'Failed to update profile');
     } finally {

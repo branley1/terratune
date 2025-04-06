@@ -21,10 +21,14 @@ const NavItem = ({ to, icon, text, isVisible }) => (
 const Sidebar = ({ isVisible, onToggle }) => {
   return (
     <aside 
-      className={`sidebar fixed left-0 top-0 bottom-0 z-50 flex flex-col bg-black/40 border-r border-white/10 ${isVisible ? 'w-60 p-6' : 'w-20 py-6 px-2.5'}`}
+      className={`sidebar h-full flex flex-col flex-shrink-0 bg-black/40 border-r border-white/10 transition-all duration-300 ease-in-out ${isVisible ? 'w-60 p-6' : 'w-20 py-6 px-2.5'}`}
       style={{ paddingBottom: '90px' }}
     >
-      <div className={`brand flex items-center mb-7 flex-shrink-0 ${!isVisible ? 'justify-center' : ''}`}>
+      <div 
+        className={`brand flex items-center mb-7 flex-shrink-0 ${!isVisible ? 'justify-center' : ''} relative cursor-pointer`}
+        onClick={onToggle}
+        title={isVisible ? 'Collapse Sidebar' : 'Expand Sidebar'}
+      >
         <div className={`leaf-icon text-emerald-400 text-3xl ${isVisible ? 'mr-2.5' : 'mr-0'} flex-shrink-0`}>
           <i className="fas fa-leaf"></i>
         </div>
@@ -33,13 +37,6 @@ const Sidebar = ({ isVisible, onToggle }) => {
             TerraTune
           </h1>
         )}
-        <button 
-          onClick={onToggle} 
-          className={`ml-auto text-gray-400 hover:text-white focus:outline-none ${!isVisible ? 'absolute left-full ml-2 top-6 transform -translate-y-1/2 bg-black/60 p-2 rounded-full backdrop-blur-sm shadow-lg' : ''}`}
-          title={isVisible ? 'Collapse Sidebar' : 'Expand Sidebar'}
-        >
-          <i className={`fas ${isVisible ? 'fa-chevron-left' : 'fa-chevron-right'}`}></i>
-        </button>
       </div>
 
       <nav className="mb-5 flex-shrink-0">

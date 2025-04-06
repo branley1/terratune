@@ -7,18 +7,21 @@ import { useAuth } from '../contexts/AuthContext';
 // import AlbumCard from '../components/AlbumCard';
 
 const LibraryPage = () => {
-  const { request, loading, error } = useApi();
-  const { user } = useAuth(); // Get user info to fetch their library
+  const { request, loading: apiLoading, error } = useApi();
+  const { user, loading: authLoading } = useAuth();
   const [playlists, setPlaylists] = useState([]);
   // Add state for artists, albums later
 
   useEffect(() => {
     const fetchLibrary = async () => {
-      if (!user) return; // Don't fetch if user is not logged in
+      if (!user?.id) {
+        console.warn('No user ID available');
+        return;
+      }
 
       try {
         // Fetch user's playlists
-        const userPlaylists = await request(`/api/playlists/user/${user.id}`);
+        const userPlaylists = await request(`/playlists/user/${user.id}`);
         setPlaylists(userPlaylists || []);
         
         // TODO: Fetch followed artists, saved albums etc.
@@ -28,8 +31,14 @@ const LibraryPage = () => {
       }
     };
 
-    fetchLibrary();
-  }, [request, user]);
+    if (!authLoading) {
+      fetchLibrary();
+    }
+  }, [request, user, authLoading]);
+
+  if (authLoading) {
+    return <div className="p-6">Loading...</div>;
+  }
 
   if (!user) {
     // Optional: Show message or redirect if user is not logged in
@@ -40,10 +49,10 @@ const LibraryPage = () => {
     <div className="p-6">
       <h1 className="text-3xl font-bold mb-6">Your Library</h1>
       
-      {loading && <p>Loading library...</p>}
+      {apiLoading && <p>Loading library...</p>}
       {error && <p className="text-red-500">Error loading library: {error}</p>}
 
-      {!loading && !error && (
+      {!apiLoading && !error && (
         <div className="library-content space-y-8">
           <section>
             <h2 className="text-xl font-bold mb-4">Playlists</h2>

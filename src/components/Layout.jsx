@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Outlet } from 'react-router-dom'; // Used to render child routes
 import Sidebar from './Sidebar'; // We'll create this next
-import Player from './Player'; // Use the existing Player component
 
 const Layout = ({ children }) => {
   // State to manage sidebar visibility - initialize as false
@@ -47,22 +46,21 @@ const Layout = ({ children }) => {
   }, [isSidebarVisible]);
 
   return (
-    <div className="app-container h-screen overflow-hidden">
+    // Use flex layout for sidebar + main content
+    <div className="flex flex-1 min-h-0"> {/* flex-1 and min-h-0 are important for flex children scrolling */}
       
-      {/* Sidebar component with visibility control */}
+      {/* Sidebar component */}
       <div ref={sidebarRef}>
         <Sidebar isVisible={isSidebarVisible} onToggle={toggleSidebar} />
       </div>
 
-      {/* Main Area - Content */}
-      <div className="main-area flex-1 flex flex-col overflow-hidden">
-        {/* Main Content - Child routes will render here */}
-        <main className="main-content flex-1 overflow-y-auto p-6">
-          {children || <Outlet />}
-        </main>
-      </div>
+      {/* Main Content Area */}
+      {/* flex-1 allows this area to grow, overflow-y-auto enables scrolling */}
+      <main className="main-content flex-1 overflow-y-auto p-6 pb-24">
+        {children || <Outlet />}
+      </main>
       
-      {/* Player remains at the bottom of the page via fixed positioning in its own component */}
+      {/* Player is now handled in App.jsx */}
     </div>
   );
 };

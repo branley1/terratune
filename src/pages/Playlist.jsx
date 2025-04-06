@@ -60,7 +60,7 @@ const PlaylistPage = () => {
                        <div>
                          <h4 className="font-medium text-sm text-white">{track.title}</h4>
                          {/* Link to artist page later */}
-                         <p className="text-xs text-gray-400">Artist Name</p> 
+                         <p className="text-xs text-gray-400">{track.artist_name || 'Unknown Artist'}</p> 
                        </div>
                      </div>
                      <span className="text-xs text-gray-400">
