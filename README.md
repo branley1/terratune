@@ -40,8 +40,8 @@ A modern web-based music streaming service built with React, Node.js, PostgreSQL
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/music-streaming.git
-   cd music-streaming
+   git clone https://github.com/branley1/terratune.git
+   cd terratune
    ```
 
 2. Install dependencies:
@@ -57,7 +57,7 @@ A modern web-based music streaming service built with React, Node.js, PostgreSQL
 
 4. Set up the database:
    ```bash
-   psql -U your_username -d music_streaming -f server/db/init.sql
+   psql -U your_username -d terratune -f server/db/init.sql
    ```
 
 5. Start the development servers:
@@ -124,11 +124,7 @@ music-streaming/
 
 ## Contributing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+Fork the repo, create feature branch, commit, push to branch and open a PR.
 
 ## License
 
